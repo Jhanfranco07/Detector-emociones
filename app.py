@@ -272,7 +272,8 @@ CSS = """
   --media:#07111f;--header:rgba(7,17,31,.92);--shadow:#02061755;}
 .gradio-container.eg-light {--page:#eef4fb;--card:#ffffff;--card-2:#f7faff;--line:rgba(51,65,85,.18);
   --muted:#52657d;--text:#0f172a;--soft-text:#24364d;--step:#ffffff;--step-line:#94a3b8;
-  --media:#e2e8f0;--header:rgba(255,255,255,.94);--shadow:#64748b2b;}
+  --media:#f8fafc;--header:rgba(255,255,255,.94);--shadow:#64748b2b;--response:#e6edf7;}
+:root {--response:#07111f88;}
 body, .gradio-container {background:var(--page) !important;color:var(--text)!important;transition:background .25s,color .25s;}
 .gradio-container {max-width:1440px !important;padding:0 24px 48px !important;color:var(--text) !important;}
 .main-header {margin:0 -24px 24px;padding:22px 30px;border-bottom:1px solid var(--line);
@@ -282,13 +283,16 @@ body, .gradio-container {background:var(--page) !important;color:var(--text)!imp
   border-radius:14px;background:linear-gradient(145deg,#2563eb,#7c3aed);box-shadow:0 12px 30px #2563eb55;}
 .brand-mark svg {width:25px}.brand h1 {font-size:1.15rem;margin:0;letter-spacing:-.02em;color:var(--text)}
 .brand p {margin:3px 0 0;color:var(--muted);font-size:.82rem}
-.header-actions {display:flex;align-items:center;gap:10px;margin-right:150px}
-.live-pill {display:flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid #34d39955;border-radius:99px;
-  color:#6ee7b7;font-size:.75rem;font-weight:800;letter-spacing:.08em;background:#064e3b33}
+.header-actions {display:flex;align-items:center;justify-content:flex-end;gap:10px;min-height:40px;margin-right:150px}
+.live-pill {height:38px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 14px;
+  border:1px solid #34d39955;border-radius:99px;color:#6ee7b7;font-size:.75rem;font-weight:800;
+  letter-spacing:.08em;background:#064e3b33}
 .live-pill span,.status-dot {width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 12px #34d399}
-#theme-toggle {position:absolute!important;z-index:10;right:30px;top:25px;width:138px!important;min-width:138px!important;
+#theme-toggle {position:absolute!important;z-index:10;right:30px;top:22px;width:138px!important;min-width:138px!important;
   height:38px!important;border:1px solid var(--line)!important;border-radius:99px!important;background:var(--step)!important;
-  color:var(--text)!important;font-weight:800!important;font-size:.7rem!important;box-shadow:0 8px 22px var(--shadow)!important}
+  color:var(--text)!important;font-weight:800!important;font-size:.7rem!important;line-height:1!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;padding:0 12px!important;
+  box-shadow:0 8px 22px var(--shadow)!important}
 #theme-toggle:hover {transform:translateY(-1px)}
 .workflow {display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;color:var(--muted);
   font-size:.76rem;font-weight:800;letter-spacing:.06em}.workflow b {color:var(--soft-text);background:var(--step);
@@ -312,7 +316,7 @@ body, .gradio-container {background:var(--page) !important;color:var(--text)!imp
 .confidence-badge {font-size:.64rem;font-weight:900;letter-spacing:.1em;color:var(--emotion);
   border:1px solid color-mix(in srgb,var(--emotion) 40%,transparent);border-radius:99px;padding:6px 9px}
 .ai-response {margin-top:16px;padding:15px 16px;border-left:3px solid var(--emotion);border-radius:5px 12px 12px 5px;
-  background:#07111f88}.ai-response span {color:var(--emotion);font-size:.61rem;font-weight:900;letter-spacing:.11em}
+  background:var(--response)}.ai-response span {color:var(--emotion);font-size:.61rem;font-weight:900;letter-spacing:.11em}
 .ai-response p {margin:7px 0 0;color:var(--soft-text);line-height:1.5;font-size:.88rem}
 .score-list {margin-top:20px;display:grid;gap:10px}.score-meta {display:flex;justify-content:space-between;
   font-size:.76rem;color:var(--soft-text)}.score-meta strong {color:var(--text)}.score-track {height:5px;border-radius:99px;
@@ -337,12 +341,23 @@ body, .gradio-container {background:var(--page) !important;color:var(--text)!imp
 .door-panel {height:35%;margin:15px;border:3px solid #c07a31;box-shadow:inset 0 0 15px #0005}.handle {position:absolute;right:12px;top:52%;
   width:10px;height:10px;border-radius:50%;background:#fde68a;box-shadow:0 0 10px #facc15}.floor-light {position:absolute;bottom:-22px;
   width:170px;height:35px;background:#fb718520;filter:blur(15px)}.floor-light.open {background:#34d39955}.door-state-text {margin-top:18px;font-size:.8rem;letter-spacing:.12em}
+.gradio-container.eg-light .emotion-copy h2 {color:#334155}
+.gradio-container.eg-light .confidence-badge {color:#475569;border-color:#94a3b8}
+.gradio-container.eg-light .ai-response span {color:#3b6595}
+.gradio-container.eg-light .empty-analysis {color:#40536c}
+.gradio-container.eg-light .empty-analysis span {background:#40536c}
+.gradio-container.eg-light .privacy-note {color:#40536c}
+.gradio-container.eg-light .media-card {background:#f8fafc!important}
+.gradio-container.eg-light .media-card button,
+.gradio-container.eg-light .media-card span,
+.gradio-container.eg-light .media-card p {color:#334155!important}
+.gradio-container.eg-light .media-card svg {color:#475569!important}
 footer {display:none!important}
 @media(max-width:800px){
   .gradio-container{padding:0 12px 32px!important}.main-header{margin:0 -12px 18px;padding:16px 14px}
   .header-inner{align-items:center;gap:10px}.brand{gap:10px}.brand-mark{width:40px;height:40px;border-radius:12px}
-  .brand h1{font-size:1rem}.brand p{font-size:.69rem;max-width:190px}.live-pill{display:none}.header-actions{margin-right:44px}
-  #theme-toggle{right:12px;top:17px;width:40px!important;min-width:40px!important;height:40px!important;padding:0!important;font-size:0!important}
+  .brand h1{font-size:1rem}.brand p{font-size:.69rem;max-width:190px}.live-pill{display:none}.header-actions{margin-right:40px;min-height:40px}
+  #theme-toggle{right:14px;top:16px;width:40px!important;min-width:40px!important;height:40px!important;padding:0!important;font-size:0!important}
   #theme-toggle:after{content:"☀";font-size:1rem}.gradio-container.eg-light #theme-toggle:after{content:"☾"}
   .workflow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 22px}
   .workflow b{display:flex;align-items:center;justify-content:flex-start;min-height:42px;padding:9px 10px;border-radius:12px;
