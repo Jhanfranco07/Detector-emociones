@@ -382,7 +382,7 @@ TOGGLE_THEME_JS = """
 }
 """
 
-with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") as demo:
+with gr.Blocks(title="EmotionGate AI") as demo:
     theme_button = gr.Button(
         "☀ CAMBIAR TEMA",
         elem_id="theme-toggle",
@@ -438,4 +438,9 @@ with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") a
     theme_button.click(fn=None, js=TOGGLE_THEME_JS)
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(
+        theme=gr.themes.Base(),
+        css=CSS,
+        js=JS,
+        ssr_mode=False,
+    )
