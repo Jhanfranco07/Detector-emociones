@@ -75,7 +75,8 @@ con una confianza mínima de 45 %.
    felicidad y supera el umbral configurado.
 7. El resultado de la CNN y la decisión se envían al LLM
    `Qwen/Qwen2.5-7B-Instruct` mediante Hugging Face Inference API.
-8. El LLM crea un mensaje breve y amable, pero nunca modifica la decisión de
+8. Python selecciona un tono y una guía apropiada para la emoción. El LLM crea
+   un mensaje breve, evita repetir el anterior y nunca modifica la decisión de
    acceso.
 9. Gradio construye la interfaz y Hugging Face Spaces aloja la aplicación.
 

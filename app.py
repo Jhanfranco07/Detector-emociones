@@ -1,4 +1,5 @@
 import os
+import random
 from pathlib import Path
 
 import cv2
@@ -24,14 +25,64 @@ LABELS = {
 }
 
 RESPONSES = {
-    "Enojo": "Acceso en pausa. Respira unos segundos e inténtalo nuevamente.",
-    "Disgusto": "La puerta permanece cerrada. Intenta cambiar tu expresión.",
-    "Miedo": "Todo está bien. La puerta permanece cerrada hasta detectar felicidad.",
-    "Felicidad": "¡Bienvenido! Felicidad detectada: puerta abierta.",
-    "Neutral": "La puerta está cerrada. Regálanos una sonrisa para ingresar.",
-    "Tristeza": "Ánimo, hoy puede mejorar. Sonríe para abrir la puerta.",
-    "Sorpresa": "¡Sorpresa detectada! Sonríe para confirmar el acceso.",
+    "Enojo": [
+        "Acceso en pausa. Respira unos segundos e inténtalo nuevamente.",
+        "Tómate un momento para respirar; la puerta te esperará.",
+        "Hagamos una pausa breve. Intenta relajarte antes de continuar.",
+    ],
+    "Disgusto": [
+        "La puerta permanece cerrada. Intenta cambiar tu expresión.",
+        "Parece que algo no te convence. Prueba con una sonrisa para continuar.",
+        "Acceso en espera. Una expresión más positiva puede abrir la puerta.",
+    ],
+    "Miedo": [
+        "Todo está bien. La puerta permanece cerrada hasta detectar felicidad.",
+        "Estás en un espacio seguro. Respira y vuelve a intentarlo.",
+        "Sin prisa: recupera la calma y sonríe cuando estés listo.",
+    ],
+    "Felicidad": [
+        "¡Bienvenido! Tu sonrisa acaba de abrir la puerta.",
+        "¡Qué buena energía! Acceso autorizado, disfruta tu visita.",
+        "Tu felicidad fue reconocida. La puerta está abierta para ti.",
+        "¡Excelente sonrisa! Puedes ingresar.",
+    ],
+    "Neutral": [
+        "La puerta está cerrada. Regálanos una sonrisa para ingresar.",
+        "Expresión neutral detectada. Sonríe para confirmar el acceso.",
+        "Todo listo, solo falta una sonrisa para abrir la puerta.",
+    ],
+    "Tristeza": [
+        "Ánimo, hoy puede mejorar. Sonríe para abrir la puerta.",
+        "Te enviamos un pequeño impulso positivo. Inténtalo nuevamente.",
+        "La puerta espera una sonrisa; tómate tu tiempo.",
+    ],
+    "Sorpresa": [
+        "¡Sorpresa detectada! Sonríe para confirmar el acceso.",
+        "Esa reacción nos tomó por sorpresa. Confirma con una sonrisa.",
+        "¡Vaya expresión! Sonríe y la puerta podrá abrirse.",
+    ],
 }
+
+EMOTION_PROMPT_GUIDES = {
+    "Enojo": "Usa un tono sereno que invite a respirar y volver a intentarlo.",
+    "Disgusto": "Usa un tono cordial y ligero que invite a cambiar la expresión.",
+    "Miedo": "Usa un tono tranquilizador, respetuoso y sin afirmar que existe peligro.",
+    "Felicidad": "Celebra su alegría y dale una bienvenida positiva y original.",
+    "Neutral": "Invita amablemente a sonreír para confirmar el acceso.",
+    "Tristeza": "Usa un tono cálido y motivador, sin realizar diagnósticos.",
+    "Sorpresa": "Usa un tono divertido y cordial que invite a confirmar con una sonrisa.",
+}
+
+MESSAGE_TONES = [
+    "cordial",
+    "motivador",
+    "creativo",
+    "entusiasta",
+    "cálido",
+    "ligeramente divertido",
+]
+
+LAST_LLM_RESPONSES = {}
 
 EMOTION_STYLES = {
     "Enojo": {"color": "#fb7185", "accent": "#e11d48", "face": "angry"},
@@ -53,11 +104,14 @@ face_cascade = cv2.CascadeClassifier(
 
 
 def generate_llm_response(emotion: str, confidence: float, is_open: bool) -> tuple[str, bool]:
-    fallback = RESPONSES[emotion]
+    fallback = random.choice(RESPONSES[emotion])
     if emotion == "Felicidad" and not is_open:
-        fallback = (
-            f"Se detectó felicidad con {confidence:.1%} de confianza. "
-            "Sonríe un poco más para superar el 45% y abrir la puerta."
+        fallback = random.choice(
+            [
+                f"Detectamos felicidad con {confidence:.1%}. Sonríe un poco más para abrir la puerta.",
+                "Tu sonrisa está cerca de lograrlo. Inténtalo nuevamente con un poco más de energía.",
+                "Casi conseguimos confirmar tu felicidad. Prueba con otra sonrisa.",
+            ]
         )
 
     token = os.getenv("HF_TOKEN")
@@ -65,11 +119,20 @@ def generate_llm_response(emotion: str, confidence: float, is_open: bool) -> tup
         return fallback, False
 
     access_state = "autorizado" if is_open else "en espera"
+    tone = random.choice(MESSAGE_TONES)
+    guide = EMOTION_PROMPT_GUIDES[emotion]
+    previous = LAST_LLM_RESPONSES.get(emotion)
+    avoid_instruction = (
+        f'No repitas ni reformules demasiado este mensaje anterior: "{previous}".'
+        if previous
+        else "Crea una frase original y evita respuestas genéricas."
+    )
     prompt = (
         f"La CNN detectó la emoción {emotion} con {confidence:.0%} de confianza. "
-        f"El acceso está {access_state}. Genera una respuesta amable y natural para "
-        "la persona, en español y de máximo 22 palabras. No diagnostiques su estado "
-        "psicológico y no cambies la decisión de acceso."
+        f"El acceso está {access_state}. {guide} Utiliza un tono {tone}. "
+        "Genera una sola respuesta natural en español de máximo 22 palabras. "
+        f"{avoid_instruction} No diagnostiques su estado psicológico y no cambies "
+        "la decisión de acceso."
     )
     try:
         client = InferenceClient(model=LLM_MODEL, token=token, timeout=20)
@@ -88,6 +151,8 @@ def generate_llm_response(emotion: str, confidence: float, is_open: bool) -> tup
             temperature=0.65,
         )
         response = result.choices[0].message.content.strip().strip('"')
+        if response:
+            LAST_LLM_RESPONSES[emotion] = response
         return response or fallback, bool(response)
     except Exception:
         return fallback, False
