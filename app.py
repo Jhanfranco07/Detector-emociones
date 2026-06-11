@@ -270,7 +270,7 @@ CSS = """
 :root {--page:#07111f;--card:#0e1b2e;--card-2:#0b1728;--line:rgba(148,163,184,.18);
   --muted:#91a4bd;--text:#f8fafc;--soft-text:#dbeafe;--step:#17243a;--step-line:#334155;
   --media:#07111f;--header:rgba(7,17,31,.92);--shadow:#02061755;}
-html[data-eg-theme="light"] {--page:#eef4fb;--card:#ffffff;--card-2:#f7faff;--line:rgba(51,65,85,.18);
+.gradio-container.eg-light {--page:#eef4fb;--card:#ffffff;--card-2:#f7faff;--line:rgba(51,65,85,.18);
   --muted:#52657d;--text:#0f172a;--soft-text:#24364d;--step:#ffffff;--step-line:#94a3b8;
   --media:#e2e8f0;--header:rgba(255,255,255,.94);--shadow:#64748b2b;}
 body, .gradio-container {background:var(--page) !important;color:var(--text)!important;transition:background .25s,color .25s;}
@@ -282,15 +282,14 @@ body, .gradio-container {background:var(--page) !important;color:var(--text)!imp
   border-radius:14px;background:linear-gradient(145deg,#2563eb,#7c3aed);box-shadow:0 12px 30px #2563eb55;}
 .brand-mark svg {width:25px}.brand h1 {font-size:1.15rem;margin:0;letter-spacing:-.02em;color:var(--text)}
 .brand p {margin:3px 0 0;color:var(--muted);font-size:.82rem}
-.header-actions {display:flex;align-items:center;gap:10px}
+.header-actions {display:flex;align-items:center;gap:10px;margin-right:150px}
 .live-pill {display:flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid #34d39955;border-radius:99px;
   color:#6ee7b7;font-size:.75rem;font-weight:800;letter-spacing:.08em;background:#064e3b33}
 .live-pill span,.status-dot {width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 12px #34d399}
-.theme-toggle {height:38px;padding:0 13px;border:1px solid var(--line);border-radius:99px;background:var(--step);
-  color:var(--text);font-weight:800;font-size:.72rem;cursor:pointer;box-shadow:0 8px 22px var(--shadow);
-  transition:transform .2s,background .25s,color .25s}.theme-toggle:hover {transform:translateY(-1px)}
-.theme-light-label {display:none}html[data-eg-theme="light"] .theme-dark-label {display:none}
-html[data-eg-theme="light"] .theme-light-label {display:inline}
+#theme-toggle {position:absolute!important;z-index:10;right:30px;top:25px;width:138px!important;min-width:138px!important;
+  height:38px!important;border:1px solid var(--line)!important;border-radius:99px!important;background:var(--step)!important;
+  color:var(--text)!important;font-weight:800!important;font-size:.7rem!important;box-shadow:0 8px 22px var(--shadow)!important}
+#theme-toggle:hover {transform:translateY(-1px)}
 .workflow {display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;color:var(--muted);
   font-size:.76rem;font-weight:800;letter-spacing:.06em}.workflow b {color:var(--soft-text);background:var(--step);
   border:1px solid var(--line);padding:8px 13px;border-radius:99px;box-shadow:0 6px 18px var(--shadow)}
@@ -342,9 +341,9 @@ footer {display:none!important}
 @media(max-width:800px){
   .gradio-container{padding:0 12px 32px!important}.main-header{margin:0 -12px 18px;padding:16px 14px}
   .header-inner{align-items:center;gap:10px}.brand{gap:10px}.brand-mark{width:40px;height:40px;border-radius:12px}
-  .brand h1{font-size:1rem}.brand p{font-size:.69rem;max-width:210px}.live-pill{display:none}.theme-toggle{width:40px;padding:0;font-size:0}
-  .theme-toggle .theme-dark-label,.theme-toggle .theme-light-label{font-size:0}.theme-toggle .theme-dark-label:after{content:"☀";font-size:1rem}
-  html[data-eg-theme="light"] .theme-toggle .theme-light-label:after{content:"☾";font-size:1rem}
+  .brand h1{font-size:1rem}.brand p{font-size:.69rem;max-width:190px}.live-pill{display:none}.header-actions{margin-right:44px}
+  #theme-toggle{right:12px;top:17px;width:40px!important;min-width:40px!important;height:40px!important;padding:0!important;font-size:0!important}
+  #theme-toggle:after{content:"☀";font-size:1rem}.gradio-container.eg-light #theme-toggle:after{content:"☾"}
   .workflow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 22px}
   .workflow b{display:flex;align-items:center;justify-content:flex-start;min-height:42px;padding:9px 10px;border-radius:12px;
     font-size:.67rem;line-height:1.2;letter-spacing:.035em;color:var(--text);border-color:#60a5fa66}
@@ -357,26 +356,38 @@ footer {display:none!important}
 
 JS = """
 () => {
-  const root = document.documentElement;
+  const app = document.querySelector("gradio-app");
+  const root = app?.shadowRoot || document;
+  const container = root.querySelector(".gradio-container");
+  if (!container) return;
   const saved = localStorage.getItem("emotiongate-theme");
   const preferred = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  root.dataset.egTheme = saved || preferred;
+  const isLight = (saved || preferred) === "light";
+  container.classList.toggle("eg-light", isLight);
+  document.body.style.background = isLight ? "#eef4fb" : "#07111f";
+  document.documentElement.style.colorScheme = isLight ? "light" : "dark";
+}
+"""
 
-  const bindToggle = () => {
-    const button = document.getElementById("emotiongate-theme-toggle");
-    if (!button || button.dataset.bound) return;
-    button.dataset.bound = "true";
-    button.addEventListener("click", () => {
-      root.dataset.egTheme = root.dataset.egTheme === "light" ? "dark" : "light";
-      localStorage.setItem("emotiongate-theme", root.dataset.egTheme);
-    });
-  };
-  bindToggle();
-  new MutationObserver(bindToggle).observe(document.body, {childList: true, subtree: true});
+TOGGLE_THEME_JS = """
+() => {
+  const app = document.querySelector("gradio-app");
+  const root = app?.shadowRoot || document;
+  const container = root.querySelector(".gradio-container");
+  if (!container) return;
+  const isLight = container.classList.toggle("eg-light");
+  localStorage.setItem("emotiongate-theme", isLight ? "light" : "dark");
+  document.body.style.background = isLight ? "#eef4fb" : "#07111f";
+  document.documentElement.style.colorScheme = isLight ? "light" : "dark";
 }
 """
 
 with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") as demo:
+    theme_button = gr.Button(
+        "☀ CAMBIAR TEMA",
+        elem_id="theme-toggle",
+        size="sm",
+    )
     gr.HTML(
         """
         <header class="main-header"><div class="header-inner">
@@ -386,9 +397,6 @@ with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") a
             <div><h1>EmotionGate AI</h1><p>Sistema híbrido de inteligencia artificial · CNN + LLM</p></div>
           </div>
           <div class="header-actions">
-            <button id="emotiongate-theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar tema">
-              <span class="theme-dark-label">☀ MODO CLARO</span><span class="theme-light-label">☾ MODO OSCURO</span>
-            </button>
             <div class="live-pill"><span></span>SISTEMA OPERATIVO</div>
           </div>
         </div></header>
@@ -427,6 +435,7 @@ with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") a
         inputs=input_image,
         outputs=[output_image, dashboard, door],
     )
+    theme_button.click(fn=None, js=TOGGLE_THEME_JS)
 
 if __name__ == "__main__":
     demo.launch()
