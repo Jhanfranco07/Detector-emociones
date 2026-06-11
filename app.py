@@ -267,28 +267,40 @@ def analyze_emotion(image: np.ndarray):
 
 
 CSS = """
-:root {--page:#07111f;--card:#0e1b2e;--line:rgba(148,163,184,.16);--muted:#91a4bd;}
-body, .gradio-container {background:var(--page) !important;}
-.gradio-container {max-width:1440px !important;padding:0 24px 48px !important;color:#f8fafc !important;}
+:root {--page:#07111f;--card:#0e1b2e;--card-2:#0b1728;--line:rgba(148,163,184,.18);
+  --muted:#91a4bd;--text:#f8fafc;--soft-text:#dbeafe;--step:#17243a;--step-line:#334155;
+  --media:#07111f;--header:rgba(7,17,31,.92);--shadow:#02061755;}
+html[data-eg-theme="light"] {--page:#eef4fb;--card:#ffffff;--card-2:#f7faff;--line:rgba(51,65,85,.18);
+  --muted:#52657d;--text:#0f172a;--soft-text:#24364d;--step:#ffffff;--step-line:#94a3b8;
+  --media:#e2e8f0;--header:rgba(255,255,255,.94);--shadow:#64748b2b;}
+body, .gradio-container {background:var(--page) !important;color:var(--text)!important;transition:background .25s,color .25s;}
+.gradio-container {max-width:1440px !important;padding:0 24px 48px !important;color:var(--text) !important;}
 .main-header {margin:0 -24px 24px;padding:22px 30px;border-bottom:1px solid var(--line);
-  background:rgba(7,17,31,.9);backdrop-filter:blur(16px);}
+  background:var(--header);backdrop-filter:blur(16px);transition:background .25s;}
 .header-inner {max-width:1380px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:24px;}
 .brand {display:flex;align-items:center;gap:14px}.brand-mark {width:46px;height:46px;display:grid;place-items:center;
   border-radius:14px;background:linear-gradient(145deg,#2563eb,#7c3aed);box-shadow:0 12px 30px #2563eb55;}
-.brand-mark svg {width:25px}.brand h1 {font-size:1.15rem;margin:0;letter-spacing:-.02em}
+.brand-mark svg {width:25px}.brand h1 {font-size:1.15rem;margin:0;letter-spacing:-.02em;color:var(--text)}
 .brand p {margin:3px 0 0;color:var(--muted);font-size:.82rem}
+.header-actions {display:flex;align-items:center;gap:10px}
 .live-pill {display:flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid #34d39955;border-radius:99px;
   color:#6ee7b7;font-size:.75rem;font-weight:800;letter-spacing:.08em;background:#064e3b33}
 .live-pill span,.status-dot {width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 12px #34d399}
+.theme-toggle {height:38px;padding:0 13px;border:1px solid var(--line);border-radius:99px;background:var(--step);
+  color:var(--text);font-weight:800;font-size:.72rem;cursor:pointer;box-shadow:0 8px 22px var(--shadow);
+  transition:transform .2s,background .25s,color .25s}.theme-toggle:hover {transform:translateY(-1px)}
+.theme-light-label {display:none}html[data-eg-theme="light"] .theme-dark-label {display:none}
+html[data-eg-theme="light"] .theme-light-label {display:inline}
 .workflow {display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;color:var(--muted);
-  font-size:.76rem;font-weight:800;letter-spacing:.06em}.workflow b {color:#dbeafe;background:#17243a;
-  border:1px solid var(--line);padding:7px 12px;border-radius:99px}.workflow i {width:28px;height:1px;background:#334155}
-.section-heading {display:flex;flex-direction:column;gap:4px;margin-bottom:16px}.section-heading strong {font-size:1.08rem}
+  font-size:.76rem;font-weight:800;letter-spacing:.06em}.workflow b {color:var(--soft-text);background:var(--step);
+  border:1px solid var(--line);padding:8px 13px;border-radius:99px;box-shadow:0 6px 18px var(--shadow)}
+.workflow b span {color:#60a5fa;margin-right:4px}.workflow i {width:28px;height:1px;background:var(--step-line)}
+.section-heading {display:flex;flex-direction:column;gap:4px;margin-bottom:16px}.section-heading strong {font-size:1.08rem;color:var(--text)}
 .section-kicker {color:#60a5fa;font-size:.67rem;font-weight:900;letter-spacing:.14em}
 .media-card,.insight-card,.door-card {height:100%;box-sizing:border-box;border:1px solid var(--line);
-  background:linear-gradient(145deg,#0f1d31,#0b1728);border-radius:20px;padding:20px;box-shadow:0 20px 50px #02061755}
+  background:linear-gradient(145deg,var(--card),var(--card-2));border-radius:20px;padding:20px;box-shadow:0 20px 50px var(--shadow)}
 .media-card {padding:0!important;overflow:hidden}.media-card > div:first-child {margin:0!important}
-.media-card img {max-height:430px!important;object-fit:contain!important;background:#07111f!important}
+.media-card img {max-height:430px!important;object-fit:contain!important;background:var(--media)!important}
 .analyze-btn {min-height:52px!important;margin-top:14px!important;border:0!important;border-radius:14px!important;
   background:linear-gradient(90deg,#2563eb,#7c3aed)!important;font-weight:800!important;box-shadow:0 12px 28px #2563eb40}
 .emotion-summary {display:flex;align-items:center;gap:20px;padding:18px;border-radius:16px;
@@ -297,15 +309,15 @@ body, .gradio-container {background:var(--page) !important;}
 .face-line {fill:none;stroke:var(--emotion);stroke-width:5;stroke-linecap:round}
 .emotion-face circle:not(:first-child):not(:nth-child(2)) {fill:var(--emotion)}
 .emotion-copy h2 {font-size:2rem;line-height:1;margin:12px 0 8px;color:var(--emotion)}
-.emotion-copy p {color:#cbd5e1;line-height:1.5;margin:0;max-width:390px}
+.emotion-copy p {color:var(--soft-text);line-height:1.5;margin:0;max-width:390px}
 .confidence-badge {font-size:.64rem;font-weight:900;letter-spacing:.1em;color:var(--emotion);
   border:1px solid color-mix(in srgb,var(--emotion) 40%,transparent);border-radius:99px;padding:6px 9px}
 .ai-response {margin-top:16px;padding:15px 16px;border-left:3px solid var(--emotion);border-radius:5px 12px 12px 5px;
   background:#07111f88}.ai-response span {color:var(--emotion);font-size:.61rem;font-weight:900;letter-spacing:.11em}
-.ai-response p {margin:7px 0 0;color:#dbeafe;line-height:1.5;font-size:.88rem}
+.ai-response p {margin:7px 0 0;color:var(--soft-text);line-height:1.5;font-size:.88rem}
 .score-list {margin-top:20px;display:grid;gap:10px}.score-meta {display:flex;justify-content:space-between;
-  font-size:.76rem;color:#cbd5e1}.score-meta strong {color:#f8fafc}.score-track {height:5px;border-radius:99px;
-  background:#1e293b;overflow:hidden;margin-top:5px}.score-fill {height:100%;border-radius:99px;transition:width .6s ease}
+  font-size:.76rem;color:var(--soft-text)}.score-meta strong {color:var(--text)}.score-track {height:5px;border-radius:99px;
+  background:var(--step);overflow:hidden;margin-top:5px}.score-fill {height:100%;border-radius:99px;transition:width .6s ease}
 .empty-analysis {height:156px;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--muted)}
 .empty-analysis span {width:7px;height:7px;border-radius:50%;background:#475569}.empty-analysis p {margin-left:8px;font-size:.82rem}
 .privacy-note {display:flex;align-items:center;gap:9px;margin-top:20px;padding-top:15px;border-top:1px solid var(--line);
@@ -326,11 +338,45 @@ body, .gradio-container {background:var(--page) !important;}
 .door-panel {height:35%;margin:15px;border:3px solid #c07a31;box-shadow:inset 0 0 15px #0005}.handle {position:absolute;right:12px;top:52%;
   width:10px;height:10px;border-radius:50%;background:#fde68a;box-shadow:0 0 10px #facc15}.floor-light {position:absolute;bottom:-22px;
   width:170px;height:35px;background:#fb718520;filter:blur(15px)}.floor-light.open {background:#34d39955}.door-state-text {margin-top:18px;font-size:.8rem;letter-spacing:.12em}
-footer {display:none!important}@media(max-width:800px){.header-inner{align-items:flex-start}.live-pill{display:none}.workflow{flex-wrap:wrap}
-  .workflow i{display:none}.emotion-summary{flex-direction:column;text-align:center}.emotion-copy h2{font-size:1.6rem}.emotion-face{width:110px;min-width:110px}}
+footer {display:none!important}
+@media(max-width:800px){
+  .gradio-container{padding:0 12px 32px!important}.main-header{margin:0 -12px 18px;padding:16px 14px}
+  .header-inner{align-items:center;gap:10px}.brand{gap:10px}.brand-mark{width:40px;height:40px;border-radius:12px}
+  .brand h1{font-size:1rem}.brand p{font-size:.69rem;max-width:210px}.live-pill{display:none}.theme-toggle{width:40px;padding:0;font-size:0}
+  .theme-toggle .theme-dark-label,.theme-toggle .theme-light-label{font-size:0}.theme-toggle .theme-dark-label:after{content:"☀";font-size:1rem}
+  html[data-eg-theme="light"] .theme-toggle .theme-light-label:after{content:"☾";font-size:1rem}
+  .workflow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 22px}
+  .workflow b{display:flex;align-items:center;justify-content:flex-start;min-height:42px;padding:9px 10px;border-radius:12px;
+    font-size:.67rem;line-height:1.2;letter-spacing:.035em;color:var(--text);border-color:#60a5fa66}
+  .workflow b span{display:grid;place-items:center;min-width:22px;height:22px;margin-right:7px;border-radius:7px;
+    color:white;background:#2563eb}.workflow i{display:none}.section-heading{margin:8px 0 10px}
+  .section-kicker{font-size:.62rem}.emotion-summary{flex-direction:column;text-align:center}.emotion-copy h2{font-size:1.6rem}
+  .emotion-face{width:110px;min-width:110px}.door-card,.insight-card{padding:14px}.door-scene{min-height:350px}
+}
 """
 
-with gr.Blocks(css=CSS, theme=gr.themes.Base(), title="EmotionGate AI") as demo:
+JS = """
+() => {
+  const root = document.documentElement;
+  const saved = localStorage.getItem("emotiongate-theme");
+  const preferred = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  root.dataset.egTheme = saved || preferred;
+
+  const bindToggle = () => {
+    const button = document.getElementById("emotiongate-theme-toggle");
+    if (!button || button.dataset.bound) return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => {
+      root.dataset.egTheme = root.dataset.egTheme === "light" ? "dark" : "light";
+      localStorage.setItem("emotiongate-theme", root.dataset.egTheme);
+    });
+  };
+  bindToggle();
+  new MutationObserver(bindToggle).observe(document.body, {childList: true, subtree: true});
+}
+"""
+
+with gr.Blocks(css=CSS, js=JS, theme=gr.themes.Base(), title="EmotionGate AI") as demo:
     gr.HTML(
         """
         <header class="main-header"><div class="header-inner">
@@ -339,10 +385,16 @@ with gr.Blocks(css=CSS, theme=gr.themes.Base(), title="EmotionGate AI") as demo:
               <path d="M4 21V4a1 1 0 0 1 1-1h11v18M4 21h16M12 12h.01"/></svg></div>
             <div><h1>EmotionGate AI</h1><p>Sistema híbrido de inteligencia artificial · CNN + LLM</p></div>
           </div>
-          <div class="live-pill"><span></span>SISTEMA OPERATIVO</div>
+          <div class="header-actions">
+            <button id="emotiongate-theme-toggle" class="theme-toggle" type="button" aria-label="Cambiar tema">
+              <span class="theme-dark-label">☀ MODO CLARO</span><span class="theme-light-label">☾ MODO OSCURO</span>
+            </button>
+            <div class="live-pill"><span></span>SISTEMA OPERATIVO</div>
+          </div>
         </div></header>
         <div class="workflow">
-          <b>01 CAPTURA</b><i></i><b>02 EMOCIÓN · CNN</b><i></i><b>03 RESPUESTA · LLM</b><i></i><b>04 ACCESO</b>
+          <b><span>01</span>CAPTURA</b><i></i><b><span>02</span>EMOCIÓN · CNN</b><i></i>
+          <b><span>03</span>RESPUESTA · LLM</b><i></i><b><span>04</span>ACCESO</b>
         </div>
         """
     )

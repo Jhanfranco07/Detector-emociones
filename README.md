@@ -27,6 +27,9 @@ puerta simulada se abre cuando la CNN detecta felicidad con suficiente confianza
 
 El LLM solamente genera texto: nunca decide ni modifica el acceso.
 
+La interfaz es adaptable a dispositivos móviles e incluye modos claro y oscuro
+con preferencia persistente en el navegador.
+
 ## Tecnologías
 
 - Hugging Face Spaces para alojar y ejecutar la aplicación.
